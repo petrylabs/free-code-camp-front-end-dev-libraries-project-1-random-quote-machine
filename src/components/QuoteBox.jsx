@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-
 import QuoteText from './QuoteText';
 import QuoteAuthor from './QuoteAuthor';
 import Button from './Button';
+import quotesJson from '../quotes.json';
 
 export default function QuoteBox(props) {
     const [quote, setQuote] = useState({
@@ -23,9 +23,7 @@ export default function QuoteBox(props) {
     const getEncodedTweet = (quoteText, quoteAuthor) => {
         return encodeURI(quoteText) + ' - ' + encodeURI(quoteAuthor);
     }
-    const getNewQuote = async () => {
-        console.log('getNewQuote()');
-        const quotes = await getQuotes();
+    const getNewQuote = async (quotes) => {
         const randomQuote = getRandomQuote(quotes);
         setQuote({
             quote: randomQuote.quote,
@@ -36,13 +34,8 @@ export default function QuoteBox(props) {
         const random = Math.floor(Math.random() * quotes.length);
         return quotes.at(random);
     }
-    const getQuotes = async () => {
-        return fetch('../quotes.json', { method: 'GET' })
-            .then((response) => response.json())
-            .then((data) => data.quotes);
-    }
     useEffect(()=>{
-        getNewQuote();
+        getNewQuote(quotesJson.quotes);
     }, []);
     return (
         <div id={props.id} className={componentCssClasses.join(' ')}>
@@ -60,7 +53,9 @@ export default function QuoteBox(props) {
                     href={`https://twitter.com/intent/tweet?text=${getEncodedTweet(quote.quote, quote.author)}`}>Tweet Quote</a>
                 <Button
                     id='new-quote'
-                    clickHandler={getNewQuote}>New Quote</Button>
+                    clickHandler={()=>{
+                        getNewQuote(quotesJson.quotes);
+                    }}>New Quote</Button>
             </div>
         </div>
     )
